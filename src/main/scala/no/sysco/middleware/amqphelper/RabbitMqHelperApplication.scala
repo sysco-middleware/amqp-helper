@@ -4,7 +4,6 @@ package no.sysco.middleware.amqphelper
 import com.rabbitmq.client.ConnectionFactory
 import no.sysco.middleware.amqphelper.utils._
 import org.slf4j.LoggerFactory
-
 import scala.util.Try
 
 object RabbitMqHelperApplication extends App with JsonRabbitCmdProtocol {
@@ -14,8 +13,8 @@ object RabbitMqHelperApplication extends App with JsonRabbitCmdProtocol {
   val logger = LoggerFactory.getLogger(this.getClass)
   val config = Config.load()
   val commands = RabbitCmds.load()
-  logger.debug(s"Config loaded: $config")
-  logger.debug(s"Commands loaded: $commands")
+  logger.info(s"Config loaded: $config")
+  logger.info(s"Commands loaded: $commands")
   val factory = getFactory(config)
   run(factory, commands)
 
@@ -84,7 +83,6 @@ object RabbitMqHelperApplication extends App with JsonRabbitCmdProtocol {
   private[amqphelper] def getFactory(config: Config): ConnectionFactory = {
     val connFactory = new ConnectionFactory
     connFactory.setHost(config.rabbitMq.host)
-    // TODO: validate vh is present
     connFactory.setVirtualHost(config.rabbitMq.virtualHost)
     connFactory.setPort(config.rabbitMq.port)
     connFactory.setUsername(config.rabbitMq.username)
