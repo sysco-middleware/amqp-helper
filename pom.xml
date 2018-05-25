@@ -54,9 +54,19 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Logging Jars -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.12</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.12</version>
+    </dependency>
+
   </dependencies>
-
-
 
 
   <build>
@@ -89,7 +99,7 @@
         <configuration>
           <transformers>
             <transformer
-              implementation= "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
               <mainClass>no.sysco.middleware.amqphelper.RabbitMqHelperApplication</mainClass>
             </transformer>
           </transformers>
