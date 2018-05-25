@@ -1,17 +1,57 @@
 package no.sysco.middleware.amqphelper
 
-import sun.misc.ObjectInputFilter.Config
+import com.rabbitmq.client.ConnectionFactory
+import no.sysco.middleware.amqphelper.utils._
 
+import scala.util.Try
 
 object RabbitMqHelperApplication extends App {
 
   import no.sysco.middleware.amqphelper.utils.Config
 
   val config = Config.load()
+  val commands = RabbitCmds.load()
+
 
   println(config)
+  println(commands)
+
+  val factory = new ConnectionFactory
+  factory.setHost(config.rabbitMq.host)
+  factory.setPort(config.rabbitMq.port)
+  factory.setUsername(config.rabbitMq.username)
+  factory.setPassword(config.rabbitMq.password)
+  factory.setConnectionTimeout(20000)
+  run(factory, commands)
+
+
+  //  channel.exchangeDeclare(MY_PRIVATE_EXCHANGE, BuiltinExchangeType.DIRECT)
+  //  channel.queueDeclare(MY_PRIVATE_QUEUE, true, false, false, null)
+  //  channel.queueBind(MY_PRIVATE_QUEUE, MY_PRIVATE_EXCHANGE, MY_ROUTING_KEY)
+  def run(factory: ConnectionFactory, cmds: RabbitMqCommands): Unit = {
+    tryWithResources(factory.newConnection()) { connection =>
+      tryWithResources(connection.createChannel()) { channel =>
+        commands.exchangesCmd.flatten[ExchangeCmd]
+          .foreach(exchangeCmd => channel.exchangeDeclare(exchangeCmd.exchange, exchangeCmd.exchangeType))
+        commands.queuesCmd.flatten[QueueCmd]
+          .foreach(queueCmd => channel.queueDeclare(queueCmd.queue, queueCmd.durable, queueCmd.exclusive, queueCmd.autoDelete, java.util.Map[String, AnyRef]))
+        commands.bindings.flatten[BindCmd]
+          .foreach(bindCmd => channel.queueBind(bindCmd.queue, bindCmd.exchange, bindCmd.routingKey))
+      }
+    }
+  }
+
+
+  private[amqphelper] def tryWithResources[A <: AutoCloseable, B](resource: A)(code: A ⇒ B): Try[B] = {
+    val tryResult = Try {
+      code(resource)
+    }
+    resource.close()
+    tryResult
+  }
 
 }
+
 
 //import com.sun.xml.internal.messaging.saaj.soap.Envelope
 //import java.io.IOException
@@ -32,8 +72,7 @@ object RabbitMqHelperApplication extends App {
 //  @throws[KeyManagementException]
 //  @throws[URISyntaxException]
 //  def main(args: Array[String]): Unit = {
-//    val factory = new Nothing
-//    val configuration = DsfServiceConfiguration.load
+//    val factory = new ConnectionFactory
 //    factory.setHost(configuration.rabbitMQ.host)
 //    factory.setPort(configuration.rabbitMQ.port)
 //    factory.setUsername(configuration.rabbitMQ.username)
@@ -43,61 +82,10 @@ object RabbitMqHelperApplication extends App {
 //    produce5Messages(factory)
 //    consumeFrom(MY_PRIVATE_QUEUE, factory)
 //  }
-//
+
 //  @throws[IOException]
 //  @throws[TimeoutException]
-//  def preStart(factory: Nothing): Unit = {
-//    try {
-//      val connection = factory.newConnection
-//      try
-//        try {
-//          val channel = connection.createChannel
-//          try {
-//            channel.exchangeDeclare(MY_PRIVATE_EXCHANGE, BuiltinExchangeType.DIRECT)
-//            channel.queueDeclare(MY_PRIVATE_QUEUE, true, false, false, null)
-//            channel.queueBind(MY_PRIVATE_QUEUE, MY_PRIVATE_EXCHANGE, MY_ROUTING_KEY)
-//          } finally if (channel != null) channel.close()
-//        }
-//        finally if (connection != null) connection.close()
-//    }
-//  }
+
 //
-//  @throws[IOException]
-//  @throws[TimeoutException]
-//  def produce5Messages(factory: Nothing): Unit = {
-//    val connection = factory.newConnection
-//    val channel = connection.createChannel
-//    var count = 0
-//    while ( {
-//      count < 5
-//    }) {
-//      val msg = String.valueOf(count)
-//      channel.basicPublish(MY_PRIVATE_EXCHANGE, MY_ROUTING_KEY, // routing-key
-//        null, // headers
-//        msg.getBytes)
-//      count += 1
-//      System.out.println("Published: " + msg)
-//    }
-//    channel.close
-//    connection.close
-//  }
-//
-//  @throws[IOException]
-//  @throws[TimeoutException]
-//  def consumeFrom(queueName: String, factory: Nothing): Unit = {
-//    val connection = factory.newConnection
-//    val channel = connection.createChannel
-//    // Old way, because Camel last version has transitive dependency for rabbitmq-client (not latest)
-//    val consumer = new Nothing(channel) {
-//      @throws[IOException]
-//      def handleDelivery(consumerTag: String, envelope: Envelope, properties: Nothing, body: Array[Byte]): Unit = {
-//        val message = new String(body, "UTF-8")
-//        System.out.println(" [x] Received '" + message + "'")
-//      }
-//    }
-//    val removeAllUpTo = true
-//    // endless ( works as while(true) loop )
-//    channel.basicConsume(queueName, false, consumer)
-//  }
 //}
-//
+

@@ -1,43 +1,43 @@
 {
-  "queues":[
+  "queues": [
     {
-      "queue":"q1",
+      "queue": "q1",
       "durable": true,
       "exclusive": true,
-      "autoDelete":false
+      "autoDelete": false
     },
     {
-      "queue":"q2",
+      "queue": "q2",
       "durable": true,
       "exclusive": false,
-      "autoDelete":false
+      "autoDelete": false
     }
   ],
-  "exchanges":[
+  "exchanges": [
     {
-      "exchange":"exch1",
-      "type":"direct"
+      "exchange": "exch1",
+      "type": "direct"
     },
     {
-      "exchange":"exch2",
-      "type":"topic"
+      "exchange": "exch2",
+      "type": "topic"
     }
   ],
-  "bindings":[
+  "bindings": [
     {
-      "queue":"q1",
-      "exchange":"exch1",
-      "routingKey":"key1"
+      "queue": "q1",
+      "exchange": "exch1",
+      "routingKey": "key1"
     },
     {
-      "queue":"q2",
-      "exchange":"exch1",
-      "routingKey":"key2"
+      "queue": "q2",
+      "exchange": "exch1",
+      "routingKey": "key2"
     },
     {
-      "queue":"q2",
-      "exchange":"exch2",
-      "routingKey":"key3"
+      "queue": "q2",
+      "exchange": "exch2",
+      "routingKey": "key3"
     }
   ]
 }
