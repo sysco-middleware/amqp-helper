@@ -3,7 +3,7 @@
     {
       "queue": "q1",
       "durable": true,
-      "exclusive": true,
+      "exclusive": false,
       "autoDelete": false
     },
     {
@@ -31,13 +31,8 @@
     },
     {
       "queue": "q2",
-      "exchange": "exch1",
-      "routingKey": "key2"
-    },
-    {
-      "queue": "q2",
       "exchange": "exch2",
-      "routingKey": "key3"
+      "routingKey": "key2"
     }
   ]
 }

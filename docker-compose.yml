@@ -8,6 +8,6 @@ services:
       - 5672:5672
       - 5671:5671
     environment:
-      - RABBITMQ_DEFAULT_USER=yo-ma-hat
-      - RABBITMQ_DEFAULT_PASS=yo-ma-soul
+      - RABBITMQ_DEFAULT_USER=foo
+      - RABBITMQ_DEFAULT_PASS=bar
       - RABBITMQ_DEFAULT_VHOST=virtual.test
