@@ -1,23 +1,27 @@
 package no.sysco.middleware.amqphelper
 
+import java.util
+
 import com.rabbitmq.client.ConnectionFactory
-import no.sysco.middleware.amqphelper.utils._
+import no.sysco.middleware.amqphelper.utils.{ExchangeCmd, JsonRabbitCmdProtocol, RabbitCmds, RabbitMqCommands}
 
 import scala.util.Try
 
-object RabbitMqHelperApplication extends App {
+object RabbitMqHelperApplication extends App with JsonRabbitCmdProtocol {
 
   import no.sysco.middleware.amqphelper.utils.Config
 
   val config = Config.load()
   val commands = RabbitCmds.load()
 
-
+  // todo: proper logging
   println(config)
   println(commands)
 
   val factory = new ConnectionFactory
   factory.setHost(config.rabbitMq.host)
+  // TODO: validate vh is present
+  factory.setVirtualHost(config.rabbitMq.virtualHost)
   factory.setPort(config.rabbitMq.port)
   factory.setUsername(config.rabbitMq.username)
   factory.setPassword(config.rabbitMq.password)
@@ -25,18 +29,57 @@ object RabbitMqHelperApplication extends App {
   run(factory, commands)
 
 
-  //  channel.exchangeDeclare(MY_PRIVATE_EXCHANGE, BuiltinExchangeType.DIRECT)
-  //  channel.queueDeclare(MY_PRIVATE_QUEUE, true, false, false, null)
-  //  channel.queueBind(MY_PRIVATE_QUEUE, MY_PRIVATE_EXCHANGE, MY_ROUTING_KEY)
   def run(factory: ConnectionFactory, cmds: RabbitMqCommands): Unit = {
+    import no.sysco.middleware.amqphelper.utils._
+    import scala.collection.JavaConverters._
+
+    // TODO: change to flatten
+    // val queueCmds : Seq[QueueCmd] = commands.exchangesCmd.flatten[Seq[QueueCmd]].flatten[Seq[QueueCmd]].getOrElse(Seq())
+    val exchangeCmds : Seq[ExchangeCmd] = commands.exchangesCmd match {
+      case Some(value) => value
+      case None => Seq()
+    }
+    val queueCmds: Seq[QueueCmd] = commands.queuesCmd match {
+      case Some(value) => value
+      case None => Seq()
+    }
+    val bindCmds: Seq[BindCmd] = commands.bindings match {
+      case Some(value) => value
+      case None => Seq()
+    }
+    val args = new java.util.HashMap[String, AnyRef]
+
+
     tryWithResources(factory.newConnection()) { connection =>
+
       tryWithResources(connection.createChannel()) { channel =>
-        commands.exchangesCmd.flatten[ExchangeCmd]
-          .foreach(exchangeCmd => channel.exchangeDeclare(exchangeCmd.exchange, exchangeCmd.exchangeType))
-        commands.queuesCmd.flatten[QueueCmd]
-          .foreach(queueCmd => channel.queueDeclare(queueCmd.queue, queueCmd.durable, queueCmd.exclusive, queueCmd.autoDelete, java.util.Map[String, AnyRef]))
-        commands.bindings.flatten[BindCmd]
-          .foreach(bindCmd => channel.queueBind(bindCmd.queue, bindCmd.exchange, bindCmd.routingKey))
+        exchangeCmds
+          .foreach(exchangeCmd => {
+            val declareOk = channel.exchangeDeclare(exchangeCmd.exchange, exchangeCmd.exchangeType)
+            println(s"Exchange [#$declareOk:$exchangeCmd]  was created ")
+          })
+      }
+
+      tryWithResources(connection.createChannel()) { channel =>
+        queueCmds
+          .foreach(queueCmd =>
+            {
+              val declareOk = channel.queueDeclare(
+                queueCmd.queue,
+                queueCmd.durable,
+                queueCmd.exclusive,
+                queueCmd.autoDelete,
+                args)
+              println(s"Queue ${declareOk.getQueue} was created ")
+            })
+      }
+
+      tryWithResources(connection.createChannel()){ channel =>
+        bindCmds
+          .foreach(bindCmd => {
+            val bindOk = channel.queueBind(bindCmd.queue, bindCmd.exchange, bindCmd.routingKey)
+            println(s"Bind [$bindOk:$bindCmd] was created")
+          })
       }
     }
   }
@@ -51,41 +94,4 @@ object RabbitMqHelperApplication extends App {
   }
 
 }
-
-
-//import com.sun.xml.internal.messaging.saaj.soap.Envelope
-//import java.io.IOException
-//import java.net.URISyntaxException
-//import java.security.KeyManagementException
-//import java.security.NoSuchAlgorithmException
-//import java.util.function.Consumer
-//
-//object RabbitMqClient {
-//  val MY_PRIVATE_QUEUE = "my-private-queue1"
-//  val MY_ROUTING_KEY: String = MY_PRIVATE_QUEUE
-//  val MY_PRIVATE_EXCHANGE = "my-custom-exchange1"
-//  val DEFAULT_EXCHANGE = ""
-//
-//  @throws[IOException]
-//  @throws[TimeoutException]
-//  @throws[NoSuchAlgorithmException]
-//  @throws[KeyManagementException]
-//  @throws[URISyntaxException]
-//  def main(args: Array[String]): Unit = {
-//    val factory = new ConnectionFactory
-//    factory.setHost(configuration.rabbitMQ.host)
-//    factory.setPort(configuration.rabbitMQ.port)
-//    factory.setUsername(configuration.rabbitMQ.username)
-//    factory.setPassword(configuration.rabbitMQ.password)
-//    factory.setConnectionTimeout(30 _000)
-//    preStart(factory)
-//    produce5Messages(factory)
-//    consumeFrom(MY_PRIVATE_QUEUE, factory)
-//  }
-
-//  @throws[IOException]
-//  @throws[TimeoutException]
-
-//
-//}
 
