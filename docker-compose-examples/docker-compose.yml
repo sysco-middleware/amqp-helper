@@ -1,0 +1,28 @@
+version: '3'
+services:
+  rabbitmq1:
+    image: rabbitmq:3-management
+    hostname: rabbitmq1
+    ports:
+      - 9999:15672
+      - 5672:5672
+      - 5671:5671
+    environment:
+      - RABBITMQ_DEFAULT_USER=foo
+      - RABBITMQ_DEFAULT_PASS=bar
+      - RABBITMQ_DEFAULT_VHOST=virtual.test
+
+  amqp-helper:
+    build: ../
+    image: syscomiddleware/amqp-helper:0.0.1
+    environment:
+      - RABBITMQ_HOST=rabbitmq1
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=foo
+      - RABBITMQ_PASSWORD=bar
+      - RABBITMQ_VIRTUAL_HOST=virtual.test
+    restart: on-failure
+    volumes:
+      - ../commands/rabbit-commands.json:/amqp-helper/rabbit-commands.json
+    depends_on:
+      - rabbitmq1
