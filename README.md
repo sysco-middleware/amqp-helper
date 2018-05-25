@@ -9,7 +9,8 @@ Main goal - simulate client's AMQPs locally via docker.
 Commands are defined in [rabbit-commands.json](./commands/rabbit-commands.json).
 Json file should be provided as volume.
 
-## Usage [Docker] 
+## Usage [Docker]
+0. Build project `./mvnw package` 
 1. Required volume with commands `/amqp-helper/rabbit-commands.json`
 2. Env variables for rabbitMq connection
 ``` 
