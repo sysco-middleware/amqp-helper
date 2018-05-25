@@ -1,0 +1,13 @@
+version: '3'
+services:
+  vigilo-rabbit-test-local:
+    image: rabbitmq:3-management
+    hostname: my-rabbit
+    ports:
+      - 9999:15672
+      - 5672:5672
+      - 5671:5671
+    environment:
+      - RABBITMQ_DEFAULT_USER=yo-ma-hat
+      - RABBITMQ_DEFAULT_PASS=yo-ma-soul
+      - RABBITMQ_DEFAULT_VHOST=virtual.test
