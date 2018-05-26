@@ -21,20 +21,9 @@ object RabbitMqHelperApplication extends App with JsonRabbitCmdProtocol {
 
   def run(factory: ConnectionFactory, cmds: RabbitMqCommands): Unit = {
 
-    // TODO: change to flatten
-    // val queueCmds : Seq[QueueCmd] = commands.exchangesCmd.flatten[Seq[QueueCmd]].getOrElse(Seq())
-    val exchangeCmds: Seq[ExchangeCmd] = commands.exchangesCmd match {
-      case Some(value) => value
-      case None => Seq()
-    }
-    val queueCmds: Seq[QueueCmd] = commands.queuesCmd match {
-      case Some(value) => value
-      case None => Seq()
-    }
-    val bindCmds: Seq[BindCmd] = commands.bindings match {
-      case Some(value) => value
-      case None => Seq()
-    }
+    val exchangeCmds: Seq[ExchangeCmd] = commands.exchangesCmd.getOrElse(Seq())
+    val queueCmds: Seq[QueueCmd] = commands.queuesCmd.getOrElse(Seq())
+    val bindCmds: Seq[BindCmd] = commands.bindings.getOrElse(Seq())
     val args = new java.util.HashMap[String, AnyRef]
 
 
