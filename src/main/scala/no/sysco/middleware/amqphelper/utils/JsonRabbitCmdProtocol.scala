@@ -15,7 +15,7 @@ final case class QueueCmd(queue: String,
                           exclusive: Boolean = false,
                           autoDelete: Boolean = false)
 
-final case class ExchangeCmd(exchange: String, exchangeType: String)
+final case class ExchangeCmd(exchange: String, exchangeType: String, durable: Boolean, autoDelete: Boolean)
 
 final case class BindCmd(queue: String, exchange: String, routingKey: String)
 
@@ -24,7 +24,7 @@ trait JsonRabbitCmdProtocol extends DefaultJsonProtocol {
 
   implicit def queueCmd: RootJsonFormat[QueueCmd] = jsonFormat(QueueCmd, "queue", "durable", "exclusive", "autoDelete")
 
-  implicit def exchangeCmdFormat: RootJsonFormat[ExchangeCmd] = jsonFormat(ExchangeCmd, "exchange", "type")
+  implicit def exchangeCmdFormat: RootJsonFormat[ExchangeCmd] = jsonFormat(ExchangeCmd, "exchange", "type", "durable", "autoDelete")
 
   implicit def bindCmdFormat: RootJsonFormat[BindCmd] = jsonFormat(BindCmd, "queue", "exchange", "routingKey")
 }

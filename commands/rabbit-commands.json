@@ -16,11 +16,15 @@
   "exchanges": [
     {
       "exchange": "exch1",
-      "type": "direct"
+      "type": "direct",
+      "durable":true,
+      "autoDelete":false
     },
     {
       "exchange": "exch2",
-      "type": "topic"
+      "type": "topic",
+      "durable":true,
+      "autoDelete":false
     }
   ],
   "bindings": [

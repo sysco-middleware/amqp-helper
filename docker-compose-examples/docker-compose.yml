@@ -14,7 +14,7 @@ services:
 
   amqp-helper:
     build: ../
-    image: syscomiddleware/amqp-helper:0.0.1
+    image: syscomiddleware/amqp-helper:0.0.2
     environment:
       - RABBITMQ_HOST=rabbitmq1
       - RABBITMQ_PORT=5672

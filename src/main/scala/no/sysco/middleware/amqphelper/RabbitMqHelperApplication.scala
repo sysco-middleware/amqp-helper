@@ -32,7 +32,7 @@ object RabbitMqHelperApplication extends App with JsonRabbitCmdProtocol {
       tryWithResources(connection.createChannel()) { channel =>
         exchangeCmds
           .foreach(exchangeCmd => {
-            val declareOk = channel.exchangeDeclare(exchangeCmd.exchange, exchangeCmd.exchangeType)
+            val declareOk = channel.exchangeDeclare(exchangeCmd.exchange, exchangeCmd.exchangeType, exchangeCmd.durable, exchangeCmd.autoDelete, args)
             logger.info(s"Exchange [#$declareOk:$exchangeCmd]  was created ")
           })
       }
