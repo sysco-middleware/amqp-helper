@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>no.sysco.middleware</groupId>
@@ -36,11 +34,25 @@
     <url>https://github.com/sysco-middleware/amqp-helper.git</url>
     <tag>HEAD</tag>
   </scm>
+
+
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/sysco-middleware/amqp-helper/issues</url>
   </issueManagement>
 
+  <distributionManagement>
+    <repository>
+      <id>sysco-central</id>
+      <name>artifactory-release</name>
+      <url>http://factory.oslo.sysco.no:8081/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>sysco-snapshots</id>
+      <name>artifactory-snapshot</name>
+      <url>http://factory.oslo.sysco.no:8081/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <dependencies>
 
@@ -122,8 +134,7 @@
         <version>3.2.0</version>
         <configuration>
           <transformers>
-            <transformer
-              implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
               <mainClass>no.sysco.middleware.amqphelper.RabbitMqHelperApplication</mainClass>
             </transformer>
           </transformers>
@@ -152,39 +163,6 @@
         </configuration>
       </plugin>
     </plugins>
-    <!--<pluginManagement>&lt;!&ndash; lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) &ndash;&gt;-->
-      <!--<plugins>-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-clean-plugin</artifactId>-->
-          <!--<version>3.0.0</version>-->
-        <!--</plugin>-->
-        <!--&lt;!&ndash; see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging &ndash;&gt;-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-resources-plugin</artifactId>-->
-          <!--<version>3.0.2</version>-->
-        <!--</plugin>-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-compiler-plugin</artifactId>-->
-          <!--<version>3.7.0</version>-->
-        <!--</plugin>-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-surefire-plugin</artifactId>-->
-          <!--<version>2.20.1</version>-->
-        <!--</plugin>-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-jar-plugin</artifactId>-->
-          <!--<version>3.0.2</version>-->
-        <!--</plugin>-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-install-plugin</artifactId>-->
-          <!--<version>2.5.2</version>-->
-        <!--</plugin>-->
-        <!--<plugin>-->
-          <!--<artifactId>maven-deploy-plugin</artifactId>-->
-          <!--<version>2.8.2</version>-->
-        <!--</plugin>-->
-      <!--</plugins>-->
-    <!--</pluginManagement>-->
   </build>
 
 </project>
